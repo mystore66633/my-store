@@ -11,8 +11,8 @@ function Navbar() {
         color: "#fff",
       }}
     >
-      <h2>My Store</h2>
-
+       <h2>Nishan</h2>
+       
       <div style={{ display: "flex", gap: "20px" }}>
         <Link to="/" style={{ color: "white" }}>Home</Link>
         <Link to="/products" style={{ color: "white" }}>Products</Link>
