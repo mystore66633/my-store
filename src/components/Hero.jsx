@@ -4,22 +4,23 @@ function Hero() {
       style={{
         background: "linear-gradient(135deg,#1976d2,#42a5f5)",
         color: "#fff",
-        padding: "80px 30px",
+        padding: "60px 20px",
         textAlign: "center",
       }}
     >
       <h1
         style={{
-          fontSize: "48px",
+          fontSize: "clamp(32px, 6vw, 48px)",
           marginBottom: "20px",
+          lineHeight: "1.2",
         }}
       >
-        Welcome to My Store
+        Welcome to Nishan
       </h1>
 
       <p
         style={{
-          fontSize: "20px",
+          fontSize: "clamp(16px, 3vw, 20px)",
           marginBottom: "30px",
         }}
       >
@@ -36,6 +37,8 @@ function Hero() {
           background: "#fff",
           color: "#1976d2",
           fontWeight: "bold",
+          maxWidth: "250px",
+          width: "100%",
         }}
       >
         Shop Now

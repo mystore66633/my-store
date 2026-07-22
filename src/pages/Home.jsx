@@ -1,68 +1,62 @@
-
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
 
 function Home() {
   return (
     <>
-      
       <Hero />
 
       <div
         style={{
-          padding: "40px",
+          padding: "20px",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px,1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
           gap: "20px",
+          maxWidth: "1200px",
+          margin: "0 auto",
         }}
       >
-        <div
-          style={{
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2>🍳 Kitchen</h2>
-          <p>Best kitchen products at affordable prices.</p>
-        </div>
+        {[
+          {
+            icon: "🍳",
+            title: "Kitchen",
+            text: "Best kitchen products at affordable prices.",
+          },
+          {
+            icon: "🏠",
+            title: "Home",
+            text: "Decorate your home with amazing products.",
+          },
+          {
+            icon: "💻",
+            title: "Electronics",
+            text: "Latest gadgets and accessories.",
+          },
+          {
+            icon: "👕",
+            title: "Fashion",
+            text: "Trending fashion for everyone.",
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            style={{
+              background: "#fff",
+              padding: "25px",
+              borderRadius: "12px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+              textAlign: "center",
+            }}
+          >
+            <h2 style={{ fontSize: "32px", marginBottom: "10px" }}>
+              {item.icon}
+            </h2>
 
-        <div
-          style={{
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2>🏠 Home</h2>
-          <p>Decorate your home with amazing products.</p>
-        </div>
+            <h3>{item.title}</h3>
 
-        <div
-          style={{
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2>💻 Electronics</h2>
-          <p>Latest gadgets and accessories.</p>
-        </div>
-
-        <div
-          style={{
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2>👕 Fashion</h2>
-          <p>Trending fashion for everyone.</p>
-        </div>
+            <p>{item.text}</p>
+          </div>
+        ))}
       </div>
 
       <Footer />
