@@ -1,10 +1,33 @@
+// ==========================================
+// IMPORTS
+// ==========================================
+
+import { Link } from "react-router-dom";
+
 import ktchn from "../assets/images/kitcn 1.webp";
 import messi from "../assets/images/messi.jpg";
+
+import ProductCard from "../components/ProductCard";
+
+// Import the product list
+import products from "../data/products";
+// ==========================================
+// PRODUCTS PAGE
+// ==========================================
 
 function Products() {
   return (
     <div style={{ padding: "30px" }}>
+
+      {/* ==========================================
+          PAGE TITLE
+      ========================================== */}
+
       <h1>🛍️ Our Products</h1>
+
+      {/* ==========================================
+          PRODUCTS CONTAINER
+      ========================================== */}
 
       <div
         style={{
@@ -14,146 +37,30 @@ function Products() {
           marginTop: "30px",
         }}
       >
-        {/* Product 1 */}
-        <div
-          style={{
-            width: "220px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "15px",
-            textAlign: "center",
-          }}
-        >
-          <img
-  src={ktchn}
-  alt="Kitchen Blender"
-  style={{
-  width: "100%",
-  height: "200px",
-  objectFit: "cover",
-  borderRadius: "8px",
-}}
-/>
-          <h3>Kitchen Blender</h3>
-          <p>₹499</p>
 
-          <button
-            style={{
-              background: "#1976d2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Add to Cart
-          </button>
-        </div>
+        {/* ==========================================
+            PRODUCT 1 - KITCHEN BLENDER
+        ========================================== */}
+{/* Show all products from products.js */}
 
-        {/* Product 2 */}
-        <div
-          style={{
-            width: "220px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "15px",
-            textAlign: "center",
-          }}
-        >
-          <img
-  src={messi}
-  alt="Messi Jersey"
-  style={{
-    width: "100%",
-    height: "200px",
-    objectFit: "cover",
-    borderRadius: "8px",
-  }}
-/>
-          <h3>messi</h3>
-          <p>₹199</p>
+{products.map((product) => (
+  <ProductCard
+    key={product.id}
+    image={product.image}
+    title={product.title}
+    category={product.category}
+    price={product.price}
+  />
+))}
 
-          <button
-            style={{
-              background: "#1976d2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Add to Cart
-          </button>
-        </div>
-
-        {/* Product 3 */}
-        <div
-          style={{
-            width: "220px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "15px",
-            textAlign: "center",
-          }}
-        >
-          <img
-            src="https://via.placeholder.com/200"
-            alt="Wireless Headphones"
-            style={{ width: "100%" }}
-          />
-          <h3>Wireless Headphones</h3>
-          <p>₹1,999</p>
-
-          <button
-            style={{
-              background: "#1976d2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Add to Cart
-          </button>
-        </div>
-
-        {/* Product 4 */}
-        <div
-          style={{
-            width: "220px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "15px",
-            textAlign: "center",
-          }}
-        >
-          <img
-            src="https://via.placeholder.com/200"
-            alt="Men's T-Shirt"
-            style={{ width: "100%" }}
-          />
-          <h3>Men's T-Shirt</h3>
-          <p>₹99</p>
-
-          <button
-            style={{
-              background: "#1976d2",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Add to Cart
-          </button>
-        </div>
       </div>
     </div>
   );
 }
+
+
+// ==========================================
+// EXPORT
+// ==========================================
 
 export default Products;
