@@ -1,4 +1,5 @@
 import ktchn from "../assets/images/kitcn 1.webp";
+import messi from "../assets/images/messi.jpg";
 
 function Products() {
   return (
@@ -34,7 +35,7 @@ function Products() {
 }}
 />
           <h3>Kitchen Blender</h3>
-          <p>₹2,499</p>
+          <p>₹499</p>
 
           <button
             style={{
@@ -61,12 +62,17 @@ function Products() {
           }}
         >
           <img
-            src="https://via.placeholder.com/200"
-            alt="Home Lamp"
-            style={{ width: "100%" }}
-          />
-          <h3>Home Lamp</h3>
-          <p>₹1,299</p>
+  src={messi}
+  alt="Messi Jersey"
+  style={{
+    width: "100%",
+    height: "200px",
+    objectFit: "cover",
+    borderRadius: "8px",
+  }}
+/>
+          <h3>messi</h3>
+          <p>₹199</p>
 
           <button
             style={{
@@ -98,7 +104,7 @@ function Products() {
             style={{ width: "100%" }}
           />
           <h3>Wireless Headphones</h3>
-          <p>₹3,999</p>
+          <p>₹1,999</p>
 
           <button
             style={{
@@ -130,7 +136,7 @@ function Products() {
             style={{ width: "100%" }}
           />
           <h3>Men's T-Shirt</h3>
-          <p>₹799</p>
+          <p>₹99</p>
 
           <button
             style={{
