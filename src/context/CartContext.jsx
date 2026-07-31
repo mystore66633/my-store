@@ -2,7 +2,7 @@
 // IMPORTS
 // ==========================================
 
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 // ==========================================
 // CREATE CONTEXT
@@ -15,7 +15,21 @@ export const CartContext = createContext();
 // ==========================================
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+  // ==========================================
+  // LOAD CART FROM LOCALSTORAGE ON STARTUP
+  // ==========================================
+  // Initialize state with cart from localStorage if it exists,
+  // otherwise use empty array. This runs once when component mounts.
+
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error("Error loading cart from localStorage:", error);
+      return [];
+    }
+  });
 
   // ==========================================
   // ADD TO CART
@@ -44,6 +58,21 @@ export function CartProvider({ children }) {
       ]);
     }
   };
+
+  // ==========================================
+  // SAVE CART TO LOCALSTORAGE WHENEVER IT CHANGES
+  // ==========================================
+  // This useEffect runs whenever the `cart` state changes.
+  // It automatically saves the updated cart to localStorage as JSON.
+  // This ensures data persists even if user closes/refreshes the browser.
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } catch (error) {
+      console.error("Error saving cart to localStorage:", error);
+    }
+  }, [cart]);
 
   // ==========================================
   // PROVIDER

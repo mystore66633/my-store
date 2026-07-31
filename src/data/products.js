@@ -15,21 +15,24 @@ const products = [
     title: "Kitchen Blender",
     category: "Kitchen",
     price: 499,
+    description: "Powerful kitchen blender with multiple speed settings. Perfect for juices, smoothies, and cooking. Features a 1.5L capacity and 600W motor for smooth blending.",
   },
 
   {
     id: 2,
     image: messi,
-    title: "Messi",
+    title: "Messi Jersey",
     category: "Sports",
     price: 199,
+    description: "Official Messi sports jersey made from high-quality breathable fabric. Perfect for football fans and players. Available in multiple sizes.",
   },
-    {
+  {
     id: 3,
     image: "https://via.placeholder.com/200",
     title: "Wireless Headphones",
     category: "Electronics",
     price: 1999,
+    description: "Premium wireless headphones with noise cancellation, 30-hour battery life, and crystal clear audio. Perfect for music lovers and professionals.",
   },
 ];
   

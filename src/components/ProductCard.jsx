@@ -3,6 +3,7 @@
 // ==========================================
 
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CartContext } from "../context/CartContext";
 
@@ -10,7 +11,7 @@ import { CartContext } from "../context/CartContext";
 // PRODUCT CARD COMPONENT
 // ==========================================
 
-function ProductCard({ image, title, category, price }) {
+function ProductCard({ id, image, title, category, price }) {
   // Get addToCart function from CartContext
   const { addToCart } = useContext(CartContext);
 
@@ -46,22 +47,31 @@ function ProductCard({ image, title, category, price }) {
           PRODUCT IMAGE
       ========================================== */}
 
-      <img
-        src={image}
-        alt={title}
-        style={{
-          width: "100%",
-          height: "220px",
-          objectFit: "cover",
-          borderRadius: "10px",
-        }}
-      />
+      <Link 
+        to={`/product/${id}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <img
+          src={image}
+          alt={title}
+          style={{
+            width: "100%",
+            height: "220px",
+            objectFit: "cover",
+            borderRadius: "10px",
+            cursor: "pointer",
+            transition: "transform 0.3s ease",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+        />
 
-      {/* ==========================================
-          PRODUCT TITLE
-      ========================================== */}
+        {/* ==========================================
+            PRODUCT TITLE
+        ========================================== */}
 
-      <h3>{title}</h3>
+        <h3 style={{ cursor: "pointer" }}>{title}</h3>
+      </Link>
 
       {/* ==========================================
           PRODUCT CATEGORY
