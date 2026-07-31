@@ -1,23 +1,14 @@
-// ==========================================
-// IMPORTS
-// ==========================================
-
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CartContext } from "../context/CartContext";
-
-// ==========================================
-// PRODUCT CARD COMPONENT
-// ==========================================
+import { WishlistContext } from "../context/WishlistContext";
 
 function ProductCard({ id, image, title, category, price }) {
-  // Get addToCart function from CartContext
   const { addToCart } = useContext(CartContext);
+  const { wishlist, toggleWishlistItem } = useContext(WishlistContext);
 
-  // ==========================================
-  // ADD PRODUCT TO CART
-  // ==========================================
+  const isWishlisted = wishlist.some((item) => item.title === title);
 
   const handleAddToCart = () => {
     addToCart({
@@ -27,8 +18,17 @@ function ProductCard({ id, image, title, category, price }) {
       price,
     });
 
-    // Show notification
     toast.success(`${title} added to cart!`);
+  };
+
+  const handleWishlistToggle = () => {
+    const result = toggleWishlistItem({ image, title, category, price });
+
+    if (result === "added") {
+      toast.success("Added to wishlist");
+    } else {
+      toast.info("Removed from wishlist");
+    }
   };
 
   return (
@@ -41,11 +41,24 @@ function ProductCard({ id, image, title, category, price }) {
         width: "100%",
         maxWidth: "320px",
         margin: "auto",
+        position: "relative",
       }}
     >
-      {/* ==========================================
-          PRODUCT IMAGE
-      ========================================== */}
+      <button
+        onClick={handleWishlistToggle}
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "12px",
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          fontSize: "22px",
+        }}
+        aria-label="Toggle wishlist"
+      >
+        {isWishlisted ? "❤️" : "🤍"}
+      </button>
 
       <Link 
         to={`/product/${id}`}
@@ -66,28 +79,12 @@ function ProductCard({ id, image, title, category, price }) {
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         />
 
-        {/* ==========================================
-            PRODUCT TITLE
-        ========================================== */}
-
         <h3 style={{ cursor: "pointer" }}>{title}</h3>
       </Link>
 
-      {/* ==========================================
-          PRODUCT CATEGORY
-      ========================================== */}
-
       <p style={{ color: "#666" }}>{category}</p>
 
-      {/* ==========================================
-          PRODUCT PRICE
-      ========================================== */}
-
       <h2 style={{ color: "#1976d2" }}>₹{price}</h2>
-
-      {/* ==========================================
-          ADD TO CART BUTTON
-      ========================================== */}
 
       <button
         onClick={handleAddToCart}
@@ -106,9 +103,5 @@ function ProductCard({ id, image, title, category, price }) {
     </div>
   );
 }
-
-// ==========================================
-// EXPORT
-// ==========================================
 
 export default ProductCard;

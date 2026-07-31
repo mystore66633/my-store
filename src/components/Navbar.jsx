@@ -11,10 +11,8 @@ import { CartContext } from "../context/CartContext";
 // ==========================================
 
 function Navbar() {
-  // Get cart items
   const { cart } = useContext(CartContext);
 
-  // Total items in cart
   const totalItems = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
@@ -33,10 +31,7 @@ function Navbar() {
         gap: "20px",
       }}
     >
-      {/* =========================
-          LOGO
-      ========================= */}
-
+      {/* Logo */}
       <h2
         style={{
           margin: 0,
@@ -47,26 +42,23 @@ function Navbar() {
         🛍️ Nishan Store
       </h2>
 
-      {/* =========================
-          SEARCH BAR
-      ========================= */}
-
+      {/* Search Bar */}
       <input
         type="text"
-        placeholder="Search products..."
+        placeholder="Search (Coming Soon)"
+        disabled
         style={{
           padding: "10px",
           width: "250px",
           borderRadius: "8px",
           border: "none",
           outline: "none",
+          opacity: 0.7,
+          cursor: "not-allowed",
         }}
       />
 
-      {/* =========================
-          MENU
-      ========================= */}
-
+      {/* Menu */}
       <div
         style={{
           display: "flex",
@@ -75,32 +67,20 @@ function Navbar() {
           alignItems: "center",
         }}
       >
-        <Link
-          to="/"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
+        <Link to="/" style={{ color: "white", textDecoration: "none" }}>
           🏠 Home
         </Link>
 
         <Link
           to="/products"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
+          style={{ color: "white", textDecoration: "none" }}
         >
           🛍 Products
         </Link>
 
         <Link
           to="/categories"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
+          style={{ color: "white", textDecoration: "none" }}
         >
           📂 Categories
         </Link>
@@ -118,10 +98,7 @@ function Navbar() {
 
         <Link
           to="/profile"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
+          style={{ color: "white", textDecoration: "none" }}
         >
           👤 Profile
         </Link>

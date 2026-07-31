@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Navbar from "./components/Navbar";
 
@@ -10,20 +13,26 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import ProductDetails from "./pages/ProductDetails";
+import Wishlist from "./pages/Wishlist";
 
 function App() {
+  // Keep the search text in the main app so the navbar and products page can share it.
+  const [searchTerm, setSearchTerm] = useState("");
+
   return (
     <>
-      <Navbar />
+      <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />
 
       <Routes>
         <Route path="/" element={<Home />} />
 
-        <Route path="/products" element={<Products />} />
+        <Route path="/products" element={<Products searchTerm={searchTerm} />} />
 
         <Route path="/product/:id" element={<ProductDetails />} />
 
         <Route path="/categories" element={<Categories />} />
+
+        <Route path="/wishlist" element={<Wishlist />} />
 
         <Route path="/cart" element={<Cart />} />
 
@@ -33,6 +42,8 @@ function App() {
 
         <Route path="/profile" element={<Profile />} />
       </Routes>
+
+      <ToastContainer />
     </>
   );
 }
