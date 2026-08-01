@@ -1,62 +1,79 @@
-// ==========================================
-// IMPORTS
-// ==========================================
+import { useContext, useEffect, useMemo, useState } from "react";
+import { addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-import { useContext, useEffect, useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import { toast } from "react-toastify";
 
-// ==========================================
-// CHECKOUT PAGE
-// ==========================================
+const DELIVERY_CHARGE = 50;
+
+const formatAddress = (address) =>
+  [
+    address.houseFlat,
+    address.street,
+    address.landmark,
+    address.city,
+    address.state,
+    address.pinCode,
+    address.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
 function Checkout() {
   const { cart, setCart } = useContext(CartContext);
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  // Customer Details
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [payment, setPayment] = useState("Cash on Delivery");
+  const [defaultAddress, setDefaultAddress] = useState(null);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(true);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
+
+  const subtotal = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart]
+  );
+  const deliveryCharge = cart.length > 0 ? DELIVERY_CHARGE : 0;
+  const total = subtotal + deliveryCharge;
 
   useEffect(() => {
     if (!user) {
       navigate("/login", { replace: true, state: { from: "/checkout" } });
-    }
-  }, [navigate, user]);
-
-  // Total Price
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  // Place Order
-  const placeOrder = async () => {
-    if (!user) {
-      navigate("/login", { state: { from: "/checkout" } });
+      setIsLoadingAddress(false);
       return;
     }
 
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !address ||
-      !city ||
-      !pincode
-    ) {
-      toast.error("Please fill all fields.");
+    const loadDefaultAddress = async () => {
+      try {
+        const snapshot = await getDocs(
+          collection(db, "users", user.uid, "addresses")
+        );
+        const addresses = snapshot.docs.map((addressDocument) => ({
+          id: addressDocument.id,
+          ...addressDocument.data(),
+        }));
+        const selectedAddress =
+          addresses.find((address) => address.isDefault) || addresses[0] || null;
+
+        setDefaultAddress(selectedAddress);
+      } catch (error) {
+        console.error("Error loading default address:", error);
+        toast.error("Unable to load your delivery address.");
+      } finally {
+        setIsLoadingAddress(false);
+      }
+    };
+
+    loadDefaultAddress();
+  }, [navigate, user]);
+
+  const placeOrder = async (event) => {
+    event.preventDefault();
+
+    if (!user) {
+      navigate("/login", { state: { from: "/checkout" } });
       return;
     }
 
@@ -65,38 +82,37 @@ function Checkout() {
       return;
     }
 
+    if (!defaultAddress) {
+      toast.error("Please add a delivery address before placing your order.");
+      return;
+    }
+
     setIsPlacingOrder(true);
 
     try {
       await addDoc(collection(db, "orders"), {
         userId: user.uid,
-        user: {
-          uid: user.uid,
-          fullName: name.trim(),
-          email: email.trim(),
-          phoneNumber: phone.trim(),
-          address: address.trim(),
-          city: city.trim(),
-          pincode: pincode.trim(),
-        },
-        items: cart.map((item) => ({
+        customerName: defaultAddress.fullName,
+        phoneNumber: defaultAddress.phoneNumber,
+        address: formatAddress(defaultAddress),
+        products: cart.map((item) => ({
           id: item.id || null,
-          title: item.title,
           image: item.image,
-          category: item.category,
-          price: item.price,
+          name: item.title,
           quantity: item.quantity,
+          price: item.price,
         })),
-        totalPrice: total,
-        paymentMethod: payment,
-        paymentStatus: "Pending",
-        orderStatus: "Placed",
+        subtotal,
+        deliveryCharge,
+        total,
+        paymentMethod,
+        orderStatus: "Pending",
         createdAt: serverTimestamp(),
       });
 
       setCart([]);
       toast.success("Order placed successfully!");
-      navigate("/orders");
+      navigate("/orders", { replace: true });
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("We could not place your order. Please try again.");
@@ -110,163 +126,286 @@ function Checkout() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "40px auto",
-        padding: "25px",
-      }}
-    >
-      <h1 style={{ textAlign: "center" }}>🛒 Checkout</h1>
+    <main style={styles.page}>
+      <div style={styles.container}>
+        <div style={styles.heading}>
+          <span style={styles.eyebrow}>Secure checkout</span>
+          <h1 style={styles.title}>Checkout</h1>
+          <p style={styles.subtitle}>
+            Review your order and confirm delivery details.
+          </p>
+        </div>
 
-      {/* Customer Details */}
+        {isLoadingAddress ? (
+          <p style={styles.message}>Loading your default address...</p>
+        ) : (
+          <form onSubmit={placeOrder} style={styles.layout}>
+            <div style={styles.mainColumn}>
+              <section style={styles.card}>
+                <div style={styles.cardHeader}>
+                  <h2 style={styles.cardTitle}>Delivery address</h2>
+                  <Link to="/addresses" style={styles.changeLink}>
+                    Manage addresses
+                  </Link>
+                </div>
 
-      <div
-        style={{
-          background: "#fff",
-          padding: "20px",
-          borderRadius: "10px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-          marginBottom: "30px",
-        }}
-      >
-        <h2>Customer Details</h2>
+                {defaultAddress ? (
+                  <div style={styles.addressBox}>
+                    <strong>{defaultAddress.fullName}</strong>
+                    <p>{formatAddress(defaultAddress)}</p>
+                    <span>Phone: {defaultAddress.phoneNumber}</span>
+                  </div>
+                ) : (
+                  <div style={styles.emptyAddress}>
+                    <p>No delivery address found.</p>
+                    <Link to="/addresses" style={styles.primaryLink}>
+                      Add an address
+                    </Link>
+                  </div>
+                )}
+              </section>
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={inputStyle}
-        />
+              <section style={styles.card}>
+                <h2 style={styles.cardTitle}>Your products</h2>
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
+                {cart.length === 0 && (
+                  <p style={styles.message}>Your cart is empty.</p>
+                )}
 
-        <input
-          type="text"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          style={inputStyle}
-        />
+                <div style={styles.productList}>
+                  {cart.map((item) => (
+                    <div key={item.id || item.title} style={styles.productRow}>
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        style={styles.productImage}
+                      />
+                      <div style={styles.productInfo}>
+                        <strong>{item.title}</strong>
+                        <span>Quantity: {item.quantity}</span>
+                        <span>Price: ₹{item.price}</span>
+                      </div>
+                      <strong>₹{item.price * item.quantity}</strong>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
 
-        <textarea
-          placeholder="Delivery Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          rows="4"
-          style={inputStyle}
-        />
+            <aside style={styles.summaryCard}>
+              <h2 style={styles.cardTitle}>Order summary</h2>
 
-        <input
-          type="text"
-          placeholder="City"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          style={inputStyle}
-        />
+              <div style={styles.summaryLine}>
+                <span>Subtotal</span>
+                <strong>₹{subtotal}</strong>
+              </div>
+              <div style={styles.summaryLine}>
+                <span>Delivery charge</span>
+                <strong>₹{deliveryCharge}</strong>
+              </div>
+              <div style={styles.totalLine}>
+                <span>Total</span>
+                <strong>₹{total}</strong>
+              </div>
 
-        <input
-          type="text"
-          placeholder="PIN Code"
-          value={pincode}
-          onChange={(e) => setPincode(e.target.value)}
-          style={inputStyle}
-        />
+              <label style={styles.paymentLabel}>
+                Payment method
+                <select
+                  value={paymentMethod}
+                  onChange={(event) => setPaymentMethod(event.target.value)}
+                  style={styles.select}
+                >
+                  <option>Cash on Delivery</option>
+                </select>
+              </label>
 
-        <h3>Payment Method</h3>
-
-        <select
-          value={payment}
-          onChange={(e) => setPayment(e.target.value)}
-          style={inputStyle}
-        >
-          <option>Cash on Delivery</option>
-          <option>UPI</option>
-          <option>Credit / Debit Card</option>
-        </select>
+              <button
+                type="submit"
+                disabled={isPlacingOrder || cart.length === 0 || !defaultAddress}
+                style={{
+                  ...styles.placeButton,
+                  opacity:
+                    isPlacingOrder || cart.length === 0 || !defaultAddress
+                      ? 0.65
+                      : 1,
+                  cursor:
+                    isPlacingOrder || cart.length === 0 || !defaultAddress
+                      ? "not-allowed"
+                      : "pointer",
+                }}
+              >
+                {isPlacingOrder ? "Placing order..." : "Place order"}
+              </button>
+            </aside>
+          </form>
+        )}
       </div>
-
-      {/* Order Summary */}
-
-      <div
-        style={{
-          background: "#fff",
-          padding: "20px",
-          borderRadius: "10px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2>📦 Order Summary</h2>
-
-        {cart.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "10px 0",
-              borderBottom: "1px solid #ddd",
-            }}
-          >
-            <span>
-              {item.title} × {item.quantity}
-            </span>
-
-            <strong>₹{item.price * item.quantity}</strong>
-          </div>
-        ))}
-
-        <h2
-          style={{
-            marginTop: "20px",
-            color: "#1976d2",
-          }}
-        >
-          Total: ₹{total}
-        </h2>
-
-        <button
-          onClick={placeOrder}
-            disabled={isPlacingOrder || cart.length === 0}
-          style={{
-            width: "100%",
-            marginTop: "20px",
-            padding: "15px",
-            background: "#1976d2",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: isPlacingOrder || cart.length === 0 ? "not-allowed" : "pointer",
-            opacity: isPlacingOrder || cart.length === 0 ? 0.7 : 1,
-            fontSize: "18px",
-            fontWeight: "bold",
-          }}
-        >
-          {isPlacingOrder ? "Placing Order..." : "Place Order"}
-        </button>
-      </div>
-    </div>
+    </main>
   );
 }
 
-// ==========================================
-// INPUT STYLE
-// ==========================================
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "15px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  boxSizing: "border-box",
+const styles = {
+  page: {
+    minHeight: "calc(100vh - 90px)",
+    padding: "44px 20px",
+    background:
+      "linear-gradient(135deg, #eaf4ff 0%, #f8fbff 55%, #fff 100%)",
+  },
+  container: {
+    width: "min(100%, 1100px)",
+    margin: "0 auto",
+  },
+  heading: {
+    marginBottom: "26px",
+  },
+  eyebrow: {
+    color: "#1976d2",
+    fontWeight: "700",
+    fontSize: "14px",
+  },
+  title: {
+    margin: "8px 0",
+    color: "#172b4d",
+    fontSize: "clamp(30px, 6vw, 42px)",
+  },
+  subtitle: {
+    margin: 0,
+    color: "#64748b",
+    lineHeight: 1.5,
+  },
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1.6fr) minmax(280px, 0.8fr)",
+    gap: "22px",
+    alignItems: "start",
+  },
+  mainColumn: {
+    display: "grid",
+    gap: "22px",
+  },
+  card: {
+    padding: "24px",
+    background: "#fff",
+    borderRadius: "16px",
+    boxShadow: "0 10px 30px rgba(25,118,210,0.1)",
+  },
+  summaryCard: {
+    padding: "24px",
+    background: "#fff",
+    borderRadius: "16px",
+    boxShadow: "0 10px 30px rgba(25,118,210,0.1)",
+    position: "sticky",
+    top: "20px",
+  },
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "16px",
+    flexWrap: "wrap",
+    marginBottom: "16px",
+  },
+  cardTitle: {
+    margin: 0,
+    color: "#172b4d",
+    fontSize: "21px",
+  },
+  changeLink: {
+    color: "#1976d2",
+    fontWeight: "700",
+    fontSize: "14px",
+  },
+  addressBox: {
+    padding: "16px",
+    borderRadius: "12px",
+    background: "#f4f9ff",
+    color: "#172b4d",
+    lineHeight: 1.5,
+  },
+  emptyAddress: {
+    padding: "16px",
+    borderRadius: "12px",
+    background: "#fff7ed",
+    color: "#9a3412",
+  },
+  primaryLink: {
+    color: "#1976d2",
+    fontWeight: "700",
+  },
+  productList: {
+    display: "grid",
+    gap: "14px",
+    marginTop: "16px",
+  },
+  productRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    paddingBottom: "14px",
+    borderBottom: "1px solid #e2e8f0",
+    color: "#172b4d",
+  },
+  productImage: {
+    width: "72px",
+    height: "72px",
+    objectFit: "cover",
+    borderRadius: "10px",
+    flexShrink: 0,
+  },
+  productInfo: {
+    display: "grid",
+    gap: "4px",
+    flex: 1,
+    minWidth: 0,
+  },
+  summaryLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
+    padding: "10px 0",
+    color: "#64748b",
+  },
+  totalLine: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
+    padding: "18px 0",
+    marginTop: "8px",
+    borderTop: "1px solid #e2e8f0",
+    color: "#1976d2",
+    fontSize: "20px",
+  },
+  paymentLabel: {
+    display: "grid",
+    gap: "8px",
+    marginTop: "16px",
+    color: "#475569",
+    fontWeight: "700",
+    fontSize: "14px",
+  },
+  select: {
+    width: "100%",
+    minHeight: "44px",
+    padding: "10px 12px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "10px",
+    background: "#fff",
+    fontSize: "15px",
+  },
+  placeButton: {
+    width: "100%",
+    marginTop: "22px",
+    padding: "14px",
+    border: 0,
+    borderRadius: "10px",
+    background: "#1976d2",
+    color: "#fff",
+    fontSize: "16px",
+    fontWeight: "700",
+  },
+  message: {
+    color: "#64748b",
+  },
 };
 
 export default Checkout;
