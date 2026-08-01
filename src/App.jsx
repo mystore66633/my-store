@@ -18,6 +18,7 @@ import Wishlist from "./pages/Wishlist";
 import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminOrders from "./pages/admin/Orders";
+import Addresses from "./pages/Addresses";
 
 function App() {
   // Keep the search text in the main app so the navbar and products page can share it.
@@ -49,6 +50,8 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/addresses" element={<Addresses />} />
 
         <Route path="/admin" element={<AdminDashboard />} />
 

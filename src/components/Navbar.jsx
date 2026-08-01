@@ -108,6 +108,7 @@ function Navbar() {
         {renderNavLink("/cart", `🛒 Cart (${totalItems})`, true)}
         {renderNavLink("/wishlist", `❤️ Wishlist (${wishlist.length})`, true)}
         {renderNavLink("/orders", "📦 My Orders", true)}
+        {renderNavLink("/addresses", "📍 Addresses")}
         {renderNavLink("/profile", "👤 Profile")}
       </div>
     </nav>
