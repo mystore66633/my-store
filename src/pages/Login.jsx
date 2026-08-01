@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
 const getAuthErrorMessage = (error) => {
@@ -41,10 +42,13 @@ function Login() {
 
     try {
       await login(form.email.trim(), form.password);
+      toast.success("Signed in successfully!");
       const destination = location.state?.from || "/profile";
       navigate(destination, { replace: true });
     } catch (authError) {
-      setError(getAuthErrorMessage(authError));
+      const message = getAuthErrorMessage(authError);
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

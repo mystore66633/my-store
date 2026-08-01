@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
@@ -33,8 +34,13 @@ function Profile() {
   }, [navigate, user]);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    try {
+      await logout();
+      toast.success("Signed out successfully.");
+      navigate("/login", { replace: true });
+    } catch {
+      toast.error("Unable to sign out. Please try again.");
+    }
   };
 
   if (!user) {
