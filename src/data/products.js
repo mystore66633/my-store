@@ -22,7 +22,7 @@ const products = [
     id: 2,
     image: messi,
     title: "Messi Jersey",
-    category: "Sports",
+    category: "Fashion",
     price: 199,
     description: "Official Messi sports jersey made from high-quality breathable fabric. Perfect for football fans and players. Available in multiple sizes.",
   },

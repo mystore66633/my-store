@@ -54,6 +54,7 @@ function Cart() {
                 display: "flex",
                 gap: "20px",
                 alignItems: "center",
+                flexWrap: "wrap",
                 border: "1px solid #ddd",
                 borderRadius: "12px",
                 padding: "20px",
@@ -66,13 +67,14 @@ function Cart() {
                 alt={item.title}
                 style={{
                   width: "140px",
+                  maxWidth: "100%",
                   height: "140px",
                   objectFit: "cover",
                   borderRadius: "10px",
                 }}
               />
 
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: "1 1 240px", minWidth: 0 }}>
                 <h2>{item.title}</h2>
 
                 <p style={{ color: "#666" }}>{item.category}</p>
@@ -89,13 +91,79 @@ function Cart() {
                     marginTop: "15px",
                   }}
                 >
-                  <button onClick={() => decreaseQuantity(index)}>
+                  <button
+                    onClick={() => decreaseQuantity(index)}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      background: "#1976d2",
+                      color: "white",
+                      fontSize: "22px",
+                      fontWeight: "bold",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.background = "#1565c0";
+                      event.currentTarget.style.transform = "scale(1.05)";
+                      event.currentTarget.style.boxShadow =
+                        "0 3px 8px rgba(0, 0, 0, 0.2)";
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.background = "#1976d2";
+                      event.currentTarget.style.transform = "scale(1)";
+                      event.currentTarget.style.boxShadow = "none";
+                    }}
+                    onMouseDown={(event) => {
+                      event.currentTarget.style.transform = "scale(0.95)";
+                    }}
+                    onMouseUp={(event) => {
+                      event.currentTarget.style.transform = "scale(1.05)";
+                    }}
+                    aria-label={`Decrease quantity of ${item.title}`}
+                  >
                     −
                   </button>
 
-                  <strong>{item.quantity}</strong>
+                  <strong style={{ minWidth: "24px", textAlign: "center" }}>
+                    {item.quantity}
+                  </strong>
 
-                  <button onClick={() => increaseQuantity(index)}>
+                  <button
+                    onClick={() => increaseQuantity(index)}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      background: "#1976d2",
+                      color: "white",
+                      fontSize: "22px",
+                      fontWeight: "bold",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.background = "#1565c0";
+                      event.currentTarget.style.transform = "scale(1.05)";
+                      event.currentTarget.style.boxShadow =
+                        "0 3px 8px rgba(0, 0, 0, 0.2)";
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.background = "#1976d2";
+                      event.currentTarget.style.transform = "scale(1)";
+                      event.currentTarget.style.boxShadow = "none";
+                    }}
+                    onMouseDown={(event) => {
+                      event.currentTarget.style.transform = "scale(0.95)";
+                    }}
+                    onMouseUp={(event) => {
+                      event.currentTarget.style.transform = "scale(1.05)";
+                    }}
+                    aria-label={`Increase quantity of ${item.title}`}
+                  >
                     +
                   </button>
                 </div>

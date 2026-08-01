@@ -1,5 +1,6 @@
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -38,24 +39,29 @@ function Home() {
             text: "Trending fashion for everyone.",
           },
         ].map((item) => (
-          <div
+          <Link
             key={item.title}
-            style={{
-              background: "#fff",
-              padding: "25px",
-              borderRadius: "12px",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-              textAlign: "center",
-            }}
+            to={`/products?category=${item.title}`}
+            style={{ color: "inherit", textDecoration: "none" }}
           >
-            <h2 style={{ fontSize: "32px", marginBottom: "10px" }}>
-              {item.icon}
-            </h2>
+            <div
+              style={{
+                background: "#fff",
+                padding: "25px",
+                borderRadius: "12px",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                textAlign: "center",
+              }}
+            >
+              <h2 style={{ fontSize: "32px", marginBottom: "10px" }}>
+                {item.icon}
+              </h2>
 
-            <h3>{item.title}</h3>
+              <h3>{item.title}</h3>
 
-            <p>{item.text}</p>
-          </div>
+              <p>{item.text}</p>
+            </div>
+          </Link>
         ))}
       </div>
 

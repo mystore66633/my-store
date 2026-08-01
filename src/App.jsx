@@ -11,9 +11,13 @@ import Categories from "./pages/Categories";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ProductDetails from "./pages/ProductDetails";
 import Wishlist from "./pages/Wishlist";
+import Orders from "./pages/Orders";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminOrders from "./pages/admin/Orders";
 
 function App() {
   // Keep the search text in the main app so the navbar and products page can share it.
@@ -34,13 +38,21 @@ function App() {
 
         <Route path="/wishlist" element={<Wishlist />} />
 
+        <Route path="/orders" element={<Orders />} />
+
         <Route path="/cart" element={<Cart />} />
 
         <Route path="/checkout" element={<Checkout />} />
 
         <Route path="/login" element={<Login />} />
 
+        <Route path="/register" element={<Register />} />
+
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/admin" element={<AdminDashboard />} />
+
+        <Route path="/admin/orders" element={<AdminOrders />} />
       </Routes>
 
       <ToastContainer />

@@ -2,8 +2,12 @@
 // IMPORTS
 // ==========================================
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { db } from "../firebase";
 import { toast } from "react-toastify";
 
 // ==========================================
@@ -12,6 +16,8 @@ import { toast } from "react-toastify";
 
 function Checkout() {
   const { cart, setCart } = useContext(CartContext);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Customer Details
   const [name, setName] = useState("");
@@ -21,6 +27,13 @@ function Checkout() {
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [payment, setPayment] = useState("Cash on Delivery");
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login", { replace: true, state: { from: "/checkout" } });
+    }
+  }, [navigate, user]);
 
   // Total Price
   const total = cart.reduce(
@@ -29,7 +42,12 @@ function Checkout() {
   );
 
   // Place Order
-  const placeOrder = () => {
+  const placeOrder = async () => {
+    if (!user) {
+      navigate("/login", { state: { from: "/checkout" } });
+      return;
+    }
+
     if (
       !name ||
       !email ||
@@ -42,18 +60,54 @@ function Checkout() {
       return;
     }
 
-    toast.success("🎉 Order placed successfully!");
+    if (cart.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
 
-    setCart([]);
+    setIsPlacingOrder(true);
 
-    setName("");
-    setEmail("");
-    setPhone("");
-    setAddress("");
-    setCity("");
-    setPincode("");
-    setPayment("Cash on Delivery");
+    try {
+      await addDoc(collection(db, "orders"), {
+        userId: user.uid,
+        user: {
+          uid: user.uid,
+          fullName: name.trim(),
+          email: email.trim(),
+          phoneNumber: phone.trim(),
+          address: address.trim(),
+          city: city.trim(),
+          pincode: pincode.trim(),
+        },
+        items: cart.map((item) => ({
+          id: item.id || null,
+          title: item.title,
+          image: item.image,
+          category: item.category,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        totalPrice: total,
+        paymentMethod: payment,
+        paymentStatus: "Pending",
+        orderStatus: "Placed",
+        createdAt: serverTimestamp(),
+      });
+
+      setCart([]);
+      toast.success("Order placed successfully!");
+      navigate("/orders");
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("We could not place your order. Please try again.");
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div
@@ -180,6 +234,7 @@ function Checkout() {
 
         <button
           onClick={placeOrder}
+            disabled={isPlacingOrder || cart.length === 0}
           style={{
             width: "100%",
             marginTop: "20px",
@@ -188,12 +243,13 @@ function Checkout() {
             color: "white",
             border: "none",
             borderRadius: "8px",
-            cursor: "pointer",
+            cursor: isPlacingOrder || cart.length === 0 ? "not-allowed" : "pointer",
+            opacity: isPlacingOrder || cart.length === 0 ? 0.7 : 1,
             fontSize: "18px",
             fontWeight: "bold",
           }}
         >
-          Place Order
+          {isPlacingOrder ? "Placing Order..." : "Place Order"}
         </button>
       </div>
     </div>

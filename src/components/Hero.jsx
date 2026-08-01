@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Hero() {
   return (
     <section
@@ -27,7 +29,8 @@ function Hero() {
         Kitchen • Home • Electronics • Fashion
       </p>
 
-      <button
+      <Link
+        to="/products"
         style={{
           padding: "15px 35px",
           border: "none",
@@ -39,10 +42,12 @@ function Hero() {
           fontWeight: "bold",
           maxWidth: "250px",
           width: "100%",
+          display: "inline-block",
+          boxSizing: "border-box",
         }}
       >
         Shop Now
-      </button>
+      </Link>
     </section>
   );
 }

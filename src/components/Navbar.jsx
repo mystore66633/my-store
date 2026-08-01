@@ -5,6 +5,7 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { WishlistContext } from "../context/WishlistContext";
 
 // ==========================================
 // NAVBAR
@@ -12,6 +13,7 @@ import { CartContext } from "../context/CartContext";
 
 function Navbar() {
   const { cart } = useContext(CartContext);
+  const { wishlist } = useContext(WishlistContext);
 
   const totalItems = cart.reduce(
     (sum, item) => sum + item.quantity,
@@ -79,13 +81,6 @@ function Navbar() {
         </Link>
 
         <Link
-          to="/categories"
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          📂 Categories
-        </Link>
-
-        <Link
           to="/cart"
           style={{
             color: "white",
@@ -94,6 +89,28 @@ function Navbar() {
           }}
         >
           🛒 Cart ({totalItems})
+        </Link>
+
+        <Link
+          to="/wishlist"
+          style={{
+            color: "white",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          ❤️ Wishlist ({wishlist.length})
+        </Link>
+
+        <Link
+          to="/orders"
+          style={{
+            color: "white",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          📦 My Orders
         </Link>
 
         <Link

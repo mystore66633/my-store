@@ -5,12 +5,17 @@ import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
 
 function ProductCard({ id, image, title, category, price }) {
-  const { addToCart } = useContext(CartContext);
+  const { cart, addToCart } = useContext(CartContext);
   const { wishlist, toggleWishlistItem } = useContext(WishlistContext);
 
   const isWishlisted = wishlist.some((item) => item.title === title);
 
   const handleAddToCart = () => {
+    const existingProduct = cart.find((item) => item.title === title);
+    const quantity = (existingProduct?.quantity || 0) + 1;
+    const toastId = `cart-${id ?? title}`;
+    const message = `${title} added to cart${quantity > 1 ? ` (${quantity})` : ""}`;
+
     addToCart({
       image,
       title,
@@ -18,7 +23,17 @@ function ProductCard({ id, image, title, category, price }) {
       price,
     });
 
-    toast.success(`${title} added to cart!`);
+    if (toast.isActive(toastId)) {
+      toast.update(toastId, {
+        render: message,
+        type: "success",
+        isLoading: false,
+      });
+    } else {
+      toast.success(message, {
+        toastId,
+      });
+    }
   };
 
   const handleWishlistToggle = () => {
@@ -41,25 +56,8 @@ function ProductCard({ id, image, title, category, price }) {
         width: "100%",
         maxWidth: "320px",
         margin: "auto",
-        position: "relative",
       }}
     >
-      <button
-        onClick={handleWishlistToggle}
-        style={{
-          position: "absolute",
-          top: "12px",
-          right: "12px",
-          border: "none",
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: "22px",
-        }}
-        aria-label="Toggle wishlist"
-      >
-        {isWishlisted ? "❤️" : "🤍"}
-      </button>
-
       <Link 
         to={`/product/${id}`}
         style={{ textDecoration: "none", color: "inherit" }}
@@ -84,7 +82,30 @@ function ProductCard({ id, image, title, category, price }) {
 
       <p style={{ color: "#666" }}>{category}</p>
 
-      <h2 style={{ color: "#1976d2" }}>₹{price}</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <h2 style={{ color: "#1976d2", margin: 0 }}>₹{price}</h2>
+
+        <button
+          onClick={handleWishlistToggle}
+          style={{
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            fontSize: "22px",
+            padding: "4px",
+          }}
+          aria-label="Toggle wishlist"
+        >
+          {isWishlisted ? "❤️" : "🤍"}
+        </button>
+      </div>
 
       <button
         onClick={handleAddToCart}
