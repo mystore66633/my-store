@@ -2,7 +2,7 @@
 // IMPORTS
 // ==========================================
 
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
@@ -18,6 +18,30 @@ function Navbar() {
   const totalItems = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
+  );
+
+  const getNavLinkStyle = (isBold = false) => ({ isActive }) => ({
+    color: "white",
+    textDecoration: "none",
+    fontWeight: isActive || isBold ? "bold" : "normal",
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "0",
+  });
+
+  const renderNavLink = (to, content, isBold = false) => (
+    <NavLink to={to} end={to === "/"} style={getNavLinkStyle(isBold)}>
+      {({ isActive }) => (
+        <>
+          <span>{content}</span>
+          <span
+            className={`navbar-indicator${isActive ? " active" : ""}`}
+            aria-hidden="true"
+          />
+        </>
+      )}
+    </NavLink>
   );
 
   return (
@@ -49,12 +73,22 @@ function Navbar() {
         type="text"
         placeholder="Search (Coming Soon)"
         disabled
+        onFocus={(event) => {
+          event.currentTarget.style.outline = "2px solid #1976d2";
+        }}
+        onBlur={(event) => {
+          event.currentTarget.style.outline = "none";
+        }}
         style={{
-          padding: "10px",
-          width: "250px",
-          borderRadius: "8px",
+          height: "44px",
+          padding: "0 12px",
+          width: "min(300px, 100%)",
+          borderRadius: "10px",
           border: "none",
           outline: "none",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          transition: "outline 0.2s ease, box-shadow 0.2s ease",
+          boxSizing: "border-box",
           opacity: 0.7,
           cursor: "not-allowed",
         }}
@@ -69,56 +103,12 @@ function Navbar() {
           alignItems: "center",
         }}
       >
-        <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-          🏠 Home
-        </Link>
-
-        <Link
-          to="/products"
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          🛍 Products
-        </Link>
-
-        <Link
-          to="/cart"
-          style={{
-            color: "white",
-            textDecoration: "none",
-            fontWeight: "bold",
-          }}
-        >
-          🛒 Cart ({totalItems})
-        </Link>
-
-        <Link
-          to="/wishlist"
-          style={{
-            color: "white",
-            textDecoration: "none",
-            fontWeight: "bold",
-          }}
-        >
-          ❤️ Wishlist ({wishlist.length})
-        </Link>
-
-        <Link
-          to="/orders"
-          style={{
-            color: "white",
-            textDecoration: "none",
-            fontWeight: "bold",
-          }}
-        >
-          📦 My Orders
-        </Link>
-
-        <Link
-          to="/profile"
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          👤 Profile
-        </Link>
+        {renderNavLink("/", "🏠 Home")}
+        {renderNavLink("/products", "🛍 Products")}
+        {renderNavLink("/cart", `🛒 Cart (${totalItems})`, true)}
+        {renderNavLink("/wishlist", `❤️ Wishlist (${wishlist.length})`, true)}
+        {renderNavLink("/orders", "📦 My Orders", true)}
+        {renderNavLink("/profile", "👤 Profile")}
       </div>
     </nav>
   );

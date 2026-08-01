@@ -30,6 +30,23 @@ nav a:hover {
   color: yellow;
 }
 
+.navbar-indicator {
+  width: 50px;
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: #bdbdbd;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.navbar-indicator.active {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 h2 {
   margin-bottom: 15px;
 }

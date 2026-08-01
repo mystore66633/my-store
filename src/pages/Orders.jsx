@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 
 function Orders() {
 	const { user } = useAuth();
-	const navigate = useNavigate();
 	const [orders, setOrders] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 
 	useEffect(() => {
 		if (!user) {
-			navigate("/login", { replace: true, state: { from: "/orders" } });
 			return;
 		}
 
@@ -44,10 +42,18 @@ function Orders() {
 		};
 
 		loadOrders();
-	}, [navigate, user]);
+	}, [user]);
 
 	if (!user) {
-		return null;
+		return (
+			<main style={styles.page}>
+				<section style={styles.emptyState}>
+					<h1 style={styles.title}>My Orders</h1>
+					<p style={styles.message}>Please sign in to view your orders.</p>
+					<Link to="/login" style={styles.link}>Sign in</Link>
+				</section>
+			</main>
+		);
 	}
 
 	return (
@@ -64,7 +70,7 @@ function Orders() {
 
 				{!isLoading && !error && orders.length === 0 && (
 					<section style={styles.emptyState}>
-						<h2>No orders yet</h2>
+						<h2>No orders yet.</h2>
 						<p>Your completed purchases will appear here.</p>
 					</section>
 				)}
@@ -118,6 +124,7 @@ const styles = {
 	orderFooter: { display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", paddingTop: "16px", borderTop: "1px solid #e2e8f0", color: "#64748b" },
 	emptyState: { padding: "36px 24px", textAlign: "center", background: "#fff", borderRadius: "16px", color: "#64748b" },
 	message: { color: "#64748b" },
+	link: { display: "inline-block", marginTop: "12px", color: "#1976d2", fontWeight: "700" },
 	error: { padding: "12px 14px", borderRadius: "10px", background: "#fff1f2", color: "#be123c", lineHeight: 1.4 },
 };
 

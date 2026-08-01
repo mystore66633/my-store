@@ -2,7 +2,7 @@
 // IMPORTS
 // ==========================================
 
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 // ==========================================
 // CREATE CONTEXT
@@ -15,7 +15,25 @@ export const WishlistContext = createContext();
 // ==========================================
 
 export function WishlistProvider({ children }) {
-  const [wishlist, setWishlist] = useState([]);
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const savedWishlist = localStorage.getItem("wishlist");
+      const parsedWishlist = savedWishlist ? JSON.parse(savedWishlist) : [];
+
+      return Array.isArray(parsedWishlist) ? parsedWishlist : [];
+    } catch (error) {
+      console.error("Error loading wishlist:", error);
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    } catch (error) {
+      console.error("Error saving wishlist:", error);
+    }
+  }, [wishlist]);
 
   // ==========================================
   // ADD OR REMOVE FROM WISHLIST
